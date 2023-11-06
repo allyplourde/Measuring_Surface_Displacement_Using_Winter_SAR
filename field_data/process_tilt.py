@@ -264,10 +264,10 @@ def plotAll(vertical_deformation):
     twnx.set_ylabel('Temperatures (°C)') # set y-axis right label
     axes[1].set_ylim(clim) # set y-axis left limits
 
-    # set x-axis limits
+    # only label every other month
     class XFormatter:
         def __call__(self, x, pos=None):
-            return '' if pos % 2 else f'{x:.1f}' # only label every other month
+            return '' if pos % 2 else f'{x:.1f}' 
 
     xlabels = []
     for i, label in enumerate(xtics): 

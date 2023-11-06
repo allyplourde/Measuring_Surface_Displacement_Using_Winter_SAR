@@ -94,8 +94,8 @@ def combine_snow_with_EC(sdf, site):
     :return: the snow depth dataframe with Environment Canada data
     """
 
-    inuvik_met_dir = '/local-scratch/users/aplourde/met_data/env_canada/Inuvik/'
-    trailvalley_met_dir = '/local-scratch/users/aplourde/met_data/env_canada/TrailValley/'
+    inuvik_met_dir = '../met_data/env_canada/Inuvik/'
+    trailvalley_met_dir = '../met_data/env_canada/TrailValley/'
 
     # get Environment Canada data
     sdf = getMetData(sdf, met_dir=inuvik_met_dir)
@@ -103,6 +103,28 @@ def combine_snow_with_EC(sdf, site):
 
     # set snow depth to nan if no snow on ground at Inuvik
     sdf.loc[sdf['Snow on Grnd (cm)_x'].isna(), 'snow_depth_cm'] = np.nan    
+
+    return sdf
+
+
+def combine_snow_with_ERA5(sdf, site):
+    """
+    This function combines the snow depth data with ERA5 Re-Analysis data
+    from the Inuvik and Trail Valley climate stations.
+    :param sdf: the snow depth dataframe
+    :param site: the site name
+
+    :return: the snow depth dataframe with Environment Canada data
+    """
+
+    era5_dir = '/local-scratch/users/aplourde/met_data/era5/delta_snow_depth/'
+
+    # get Environment Canada data
+    sdf = getMetData(sdf, met_dir=inuvik_met_dir)
+    sdf = getMetData(sdf, met_dir=trailvalley_met_dir)
+
+    # set snow depth to nan if no snow on ground at Inuvik
+    sdf.loc[sdf['Snow on Grnd (cm)_x'].isna(), 'snow_depth_cm'] = np.nan
 
     return sdf
 
@@ -240,10 +262,11 @@ if __name__ == "__main__":
         
         # combine with Environment Canada data
         snow_depth[site] = combine_snow_with_EC(snow_depth[site], site)
+        snow_depth[site] = combine_snow_with_ERA5(snow_depth[site], site)
 
         # save processed data
         outdir = os.path.join(field_dir, site) 
         outfile = os.path.join(outdir, site + '_snow_depth_processed.csv')
-        df.to_csv(outfile)
+        snow_depth[site].to_csv(outfile)
 
     plotAll(snow_depth)
